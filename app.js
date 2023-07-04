@@ -21,18 +21,6 @@ const store = new MongoDBStore({
   collection: 'sessions',
 });
 
-app.use((req, res, next) => {
-  if (!req.session.user) {
-    return next();
-  }
-  User.findById(req.session.user._id)
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
-});
-
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
@@ -49,7 +37,10 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  User.findById('649c183d02a4cc1ee619633d')
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
     .then((user) => {
       req.user = user;
       next();
@@ -64,22 +55,12 @@ app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
-  .connect('mongodb://127.0.0.1:27017/shop')
-  .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: 'Max',
-          email: 'max@test.com',
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-      }
-    });
-    app.listen(3000);
-  })
+  .connect(MONGODB_URL)
+  .then(() =>
+    app.listen(3000, () =>
+      console.log(`server listening on http://localhost:3000`)
+    )
+  )
   .catch((err) => {
     console.log(err);
   });
