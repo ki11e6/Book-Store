@@ -13,13 +13,25 @@ const MONGODB_URL = 'mongodb://127.0.0.1:27017/shop';
 
 const app = express();
 
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 const store = new MongoDBStore({
   uri: MONGODB_URL,
   collection: 'sessions',
 });
 
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+app.use((req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
+});
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
