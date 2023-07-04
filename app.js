@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -38,9 +39,11 @@ app.use(
     store: store,
   })
 );
-
+//below need to be used after session
 //csrf protection againt cross site request forgery
 app.use(csrfProtection);
+//message middleware
+app.use(flash());
 
 //check user in session and set user as current user
 app.use((req, res, next) => {
