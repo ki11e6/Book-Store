@@ -3,8 +3,9 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 // const sendgridTransport = require('nodemailer-sendgrid-transport');
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// const sgMail = require('@sendgrid/mail');
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// console.log(process.env.SENDGRID_API_KEY);
 
 // const transporter = nodemailer.createTransport(
 //   sendgridTransport({
@@ -13,6 +14,14 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 //     },
 //   })
 // );
+const transporter = nodemailer.createTransport({
+  host: 'smtp.ethereal.email',
+  port: 587,
+  auth: {
+    user: 'natalie.marquardt21@ethereal.email',
+    pass: 'sSU9shaAHRhG6nDyav',
+  },
+});
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -99,28 +108,36 @@ exports.postSignup = (req, res, next) => {
         .then((result) => {
           res.redirect('/login');
           //signup success mail
-          // return transporter.sendMail({
-          //   to: email,
-          //   form: 'bookstore@myshop.com',
+
+          // const msg = {
+          //   to: email, // Change to your recipient
+          //   from: 'bookstore@myshop.com', // Change to your verified sender
           //   subject: 'Signup Success',
           //   html: '<h1>Signup Successfully!!!</h1',
-          // });
-          const msg = {
-            to: email, // Change to your recipient
-            from: 'bookstore@myshop.com', // Change to your verified sender
-            subject: 'Signup Success',
-            html: '<h1>Signup Successfully!!!</h1',
-          };
+          // };
+          return transporter.sendMail(
+            {
+              to: email,
+              form: 'bookstore@myshop.com',
+              subject: 'Signup Success',
+              html: '<h1>Signup Successfully!!!</h1',
+            },
+            () => console.log('email sent successfully')
+          );
 
-          return sgMail
-            .send(msg)
-            .then((response) => {
-              console.log(response[0].statusCode);
-              console.log(response[0].headers);
-            })
-            .catch((error) => {
-              console.error(error);
-            });
+          //  sgMail.send(msg).then(
+          //   (response) => {
+          //     console.log(response[0].statusCode);
+          //     console.log(response[0].headers);
+          //   },
+          //   (error) => {
+          //     console.error(error);
+
+          //     if (error.response) {
+          //       console.error(error.response.body);
+          //     }
+          //   }
+          // );
         })
         .catch((err) => {
           console.log(err);
