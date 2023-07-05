@@ -1,17 +1,18 @@
+const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-const sendgridTransport = require('nodemailer-sendgrid-transport');
+// const sendgridTransport = require('nodemailer-sendgrid-transport');
 
-const User = require('../models/user');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const transporter = nodemailer.createTransport(
-  sendgridTransport({
-    auth: {
-      api_key:
-        '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',
-    },
-  })
-);
+// const transporter = nodemailer.createTransport(
+//   sendgridTransport({
+//     auth: {
+//       api_key: process.env.SENDGRID_API_KEY,
+//     },
+//   })
+// );
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -98,12 +99,28 @@ exports.postSignup = (req, res, next) => {
         .then((result) => {
           res.redirect('/login');
           //signup success mail
-          return transporter.sendMail({
-            to: result.email || 'sharath.surendran.m@gmail.com',
-            form: 'bookstore@myshop.com',
+          // return transporter.sendMail({
+          //   to: email,
+          //   form: 'bookstore@myshop.com',
+          //   subject: 'Signup Success',
+          //   html: '<h1>Signup Successfully!!!</h1',
+          // });
+          const msg = {
+            to: email, // Change to your recipient
+            from: 'bookstore@myshop.com', // Change to your verified sender
             subject: 'Signup Success',
             html: '<h1>Signup Successfully!!!</h1',
-          });
+          };
+
+          return sgMail
+            .send(msg)
+            .then((response) => {
+              console.log(response[0].statusCode);
+              console.log(response[0].headers);
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         })
         .catch((err) => {
           console.log(err);
