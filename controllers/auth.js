@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 // const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 // const sgMail = require('@sendgrid/mail');
@@ -14,14 +16,14 @@ const nodemailer = require('nodemailer');
 //     },
 //   })
 // );
-const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
-  auth: {
-    user: 'natalie.marquardt21@ethereal.email',
-    pass: 'sSU9shaAHRhG6nDyav',
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   host: 'smtp.ethereal.email',
+//   port: 587,
+//   auth: {
+//     user: 'natalie.marquardt21@ethereal.email',
+//     pass: 'sSU9shaAHRhG6nDyav',
+//   },
+// });
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -111,36 +113,38 @@ exports.postSignup = (req, res, next) => {
 
           // const msg = {
           //   to: email, // Change to your recipient
-          //   from: 'bookstore@myshop.com', // Change to your verified sender
-          //   subject: 'Signup Success',
-          //   html: '<h1>Signup Successfully!!!</h1',
+          // from: 'bookstore@myshop.com', // Change to your verified sender
+          // subject: 'Signup Success',
+          // html: '<h1>Signup Successfully!!!</h1',
           // };
-          return transporter.sendMail(
-            {
-              to: email,
-              form: 'bookstore@myshop.com',
-              subject: 'Signup Success',
-              html: '<h1>Signup Successfully!!!</h1',
-            },
-            () => console.log('email sent successfully')
-          );
-
-          //  sgMail.send(msg).then(
-          //   (response) => {
-          //     console.log(response[0].statusCode);
-          //     console.log(response[0].headers);
+          const msg = {
+            to: email,
+            from: process.env.FROM_EMAIL, // Use the email address or domain you verified above
+            subject: 'Signup Success',
+            html: '<h1>Dear user, Your have Successfully Signed in to BookStore!</h1',
+          };
+          // return transporter.sendMail(
+          //   {
+          //     to: email,
+          //     form: 'bookstore@myshop.com',
+          //     subject: 'Signup Success',
+          //     html: '<h1>Signup Successfully!!!</h1',
           //   },
-          //   (error) => {
-          //     console.error(error);
-
-          //     if (error.response) {
-          //       console.error(error.response.body);
-          //     }
-          //   }
+          //   () => console.log('email sent successfully')
           // );
-        })
-        .catch((err) => {
-          console.log(err);
+
+          return sgMail.send(msg).then(
+            () => {
+              console.log('email sent successfully');
+            },
+            (error) => {
+              console.error(error);
+
+              if (error.response) {
+                console.error(error.response.body);
+              }
+            }
+          );
         });
     })
     .catch((err) => {
