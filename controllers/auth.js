@@ -1,26 +1,16 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
-// const sgMail = require('@sendgrid/mail');
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const nodemailer = require('nodemailer');
 
-// const sgMail = require('@sendgrid/mail');
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-// console.log(process.env.SENDGRID_API_KEY);
-
-// const transporter = nodemailer.createTransport(
-//   sendgridTransport({
-//     auth: {
-//       api_key: process.env.SENDGRID_API_KEY,
-//     },
-//   })
-// );
 const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
+  service: 'gmail',
   auth: {
-    user: 'natalie.marquardt21@ethereal.email',
-    pass: 'sSU9shaAHRhG6nDyav',
+    type: 'OAuth2',
+    user: process.env.MAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD,
+    clientId: process.env.OAUTH_CLIENTID,
+    clientSecret: process.env.OAUTH_CLIENT_SECRET,
+    refreshToken: process.env.OAUTH_REFRESH_TOKEN,
   },
 });
 
@@ -109,41 +99,16 @@ exports.postSignup = (req, res, next) => {
         .then((result) => {
           res.redirect('/login');
           //signup success mail
-
-          const msg = {
-            to: email, // Change to your recipient
-            from: 'bookstore@myshop.com', // Change to your verified sender
+          let mailOptions = {
+            from: process.env.FROM_EMAIL,
+            to: email,
             subject: 'Signup Success',
-            html: '<h1>Signup Successfully!!!</h1',
+            html: '<h1>Dear user, Your have Successfully Signed in to BookStore!</h1',
           };
-          // const msg = {
-          //   to: email,
-          //   from: process.env.FROM_EMAIL, // Use the email address or domain you verified above
-          //   subject: 'Signup Success',
-          //   html: '<h1>Dear user, Your have Successfully Signed in to BookStore!</h1',
-          // };
-          return transporter.sendMail(
-            {
-              to: email,
-              form: 'bookstore@myshop.com',
-              subject: 'Signup Success',
-              html: '<h1>Signup Successfully!!!</h1',
-            },
-            () => console.log('email sent successfully')
-          );
-
-          // return sgMail.send(msg).then(
-          //   () => {
-          //     console.log('email sent successfully');
-          //   },
-          //   (error) => {
-          //     console.error(error);
-
-          //     if (error.response) {
-          //       console.error(error.response.body);
-          //     }
-          //   }
-          // );
+          return transporter
+            .sendMail(mailOptions)
+            .then(() => console.log('mail sent successfully'))
+            .catch((error) => console.log('Error:' + error));
         });
     })
     .catch((err) => {
