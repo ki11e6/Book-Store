@@ -21,3 +21,14 @@
 .form-control textarea:focus {
   outline-color: #00695c;
 }
+
+.reset-btn a {
+  padding: 0.25rem 1rem;
+  text-decoration: none;
+  font: inherit;
+  border: 1px solid #5a5c5c;
+  color: #4475e0;
+  background: white;
+  border-radius: 3px;
+  cursor: pointer;
+}

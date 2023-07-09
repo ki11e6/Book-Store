@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const sentEmail = (email, callback) => {
+const sentEmail = (mailOptions, callback) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -13,13 +13,13 @@ const sentEmail = (email, callback) => {
     },
   });
 
-  let mailOptions = {
-    from: process.env.FROM_EMAIL,
-    to: email,
-    subject: 'Signup Success',
-    text: 'Welcome to BookStore',
-    html: '<h2>Your have Successfully Signed in to BookStore!<h2>',
-  };
+  // let mailOptions = {
+  //   from: process.env.FROM_EMAIL,
+  //   to: email,
+  //   subject: 'Signup Success',
+  //   text: 'Welcome to BookStore',
+  //   html: '<h2>Your have Successfully Signed in to BookStore!<h2>',
+  // };
 
   transporter.sendMail(mailOptions, function (err) {
     if (err) {
