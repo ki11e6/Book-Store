@@ -37,6 +37,7 @@ exports.postLogin = (req, res, next) => {
     .then((user) => {
       if (!user) {
         req.flash('error', 'Invalid email or password.');
+        console.log(req.flash('error'));
         return res.redirect('/login');
       }
       bcrypt
@@ -105,5 +106,20 @@ exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
     console.log(err);
     res.redirect('/');
+  });
+};
+
+exports.getReset = (req, res, next) => {
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message[0];
+    console.log(message);
+  } else {
+    message = null;
+  }
+  res.render('auth/reset', {
+    path: '/reset',
+    pageTitle: 'Reset',
+    errorMessage: message,
   });
 };
