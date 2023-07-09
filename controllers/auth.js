@@ -2,7 +2,7 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('../util/nodemailGmail');
 
-exports.getLogin = (req, res, next) => {
+exports.getLogin = (req, res) => {
   let message = req.flash('error');
   if (message.length > 0) {
     message = message[0];
@@ -16,7 +16,7 @@ exports.getLogin = (req, res, next) => {
   });
 };
 
-exports.getSignup = (req, res, next) => {
+exports.getSignup = (req, res) => {
   let message = req.flash('error');
   if (message.length > 0) {
     message = message[0];
@@ -30,7 +30,7 @@ exports.getSignup = (req, res, next) => {
   });
 };
 
-exports.postLogin = (req, res, next) => {
+exports.postLogin = (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   User.findOne({ email: email })
@@ -62,10 +62,10 @@ exports.postLogin = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.postSignup = (req, res, next) => {
+exports.postSignup = (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
+  // const confirmPassword = req.body.confirmPassword;
   User.findOne({ email: email })
     .then((userDoc) => {
       if (userDoc) {
@@ -85,7 +85,7 @@ exports.postSignup = (req, res, next) => {
           });
           return user.save();
         })
-        .then((result) => {
+        .then(() => {
           res.redirect('/login');
           //signup success mail
           return sendEmail(email, (err) => {
@@ -102,14 +102,14 @@ exports.postSignup = (req, res, next) => {
     });
 };
 
-exports.postLogout = (req, res, next) => {
+exports.postLogout = (req, res) => {
   req.session.destroy((err) => {
     console.log(err);
     res.redirect('/');
   });
 };
 
-exports.getReset = (req, res, next) => {
+exports.getReset = (req, res) => {
   let message = req.flash('error');
   if (message.length > 0) {
     message = message[0];

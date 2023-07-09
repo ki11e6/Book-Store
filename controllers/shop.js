@@ -1,7 +1,7 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
 
-exports.getProducts = (req, res, next) => {
+exports.getProducts = (req, res) => {
   Product.find()
     .then((products) => {
       console.log(products);
@@ -17,7 +17,7 @@ exports.getProducts = (req, res, next) => {
     });
 };
 
-exports.getProduct = (req, res, next) => {
+exports.getProduct = (req, res) => {
   const prodId = req.params.productId;
   Product.findById(prodId)
     .then((product) => {
@@ -31,7 +31,7 @@ exports.getProduct = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.getIndex = (req, res, next) => {
+exports.getIndex = (req, res) => {
   Product.find()
     .then((products) => {
       res.render('shop/index', {
@@ -45,7 +45,7 @@ exports.getIndex = (req, res, next) => {
     });
 };
 
-exports.getCart = (req, res, next) => {
+exports.getCart = (req, res) => {
   req.user
     .populate('cart.items.productId')
     .then((user) => {
@@ -60,7 +60,7 @@ exports.getCart = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.postCart = (req, res, next) => {
+exports.postCart = (req, res) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
     .then((product) => {
@@ -72,17 +72,17 @@ exports.postCart = (req, res, next) => {
     });
 };
 
-exports.postCartDeleteProduct = (req, res, next) => {
+exports.postCartDeleteProduct = (req, res) => {
   const prodId = req.body.productId;
   req.user
     .removeFromCart(prodId)
-    .then((result) => {
+    .then(() => {
       res.redirect('/cart');
     })
     .catch((err) => console.log(err));
 };
 
-exports.postOrder = (req, res, next) => {
+exports.postOrder = (req, res) => {
   req.user
     .populate('cart.items.productId')
     .then((user) => {
@@ -98,7 +98,7 @@ exports.postOrder = (req, res, next) => {
       });
       return order.save();
     })
-    .then((result) => {
+    .then(() => {
       return req.user.clearCart();
     })
     .then(() => {
@@ -107,7 +107,7 @@ exports.postOrder = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.getOrders = (req, res, next) => {
+exports.getOrders = (req, res) => {
   Order.find({ 'user.userId': req.user._id })
     .then((orders) => {
       res.render('shop/orders', {

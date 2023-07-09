@@ -21,7 +21,7 @@ const sentEmail = (email, callback) => {
     html: '<h2>Your have Successfully Signed in to BookStore!<h2>',
   };
 
-  transporter.sendMail(mailOptions, function (err, data) {
+  transporter.sendMail(mailOptions, function (err) {
     if (err) {
       callback(err);
     } else {
