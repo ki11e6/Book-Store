@@ -137,40 +137,110 @@ exports.getReset = (req, res) => {
 
 exports.postReset = (req, res) => {
   const email = req.body.email;
-  let token;
-  User.findOne({ email: email })
-    .then((user) => {
-      if (!user) {
-        req.flash('reset-error', 'Email does not exist');
-        console.log(req.flash('error'));
-        return res.redirect('/reset');
-      }
-      crypto.randomBytes(32, (err, buffer) => {
-        if (err) {
-          console.log(err);
-          req.flash('reset-error', 'Something went wrong!Retry');
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      req.flash('reset-error', 'Something went wrong!Retry');
+      return res.redirect('/reset');
+    }
+    User.findOne({ email: email })
+      .then((user) => {
+        if (!user) {
+          req.flash('reset-error', 'Email does not exist');
+          console.log(req.flash('error'));
           return res.redirect('/reset');
         }
-        token = buffer.toString('hex');
+
+        const token = buffer.toString('hex');
         user.resetToken = token;
         user.resetTokenExpiration = Date.now() + 36000000;
-        user.save();
+        return user.save();
+      })
+      .then((user) => {
+        const rlink = `http://localhost:${process.env.PORT}/reset/${user.resetToken}`;
+        let mailOptions = {
+          from: process.env.FROM_EMAIL,
+          to: email,
+          subject: 'Password reset',
+          // text: 'Welcome to BookStore',
+          html: `
+        <p>You requested a password reset</p>
+        <p>click this <a href=${rlink}>Link</a> to set a new password</p>
+        `,
+        };
+        res.redirect('/');
+        return sendEmail(mailOptions, (err) => {
+          if (err) {
+            console.log('Error:' + err);
+          } else {
+            console.log('mail sent successfully');
+          }
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-      return user;
-    })
+  });
+};
+
+exports.getNewPassword = (req, res) => {
+  const token = req.params.token;
+  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
     .then((user) => {
-      const rlink = `https://localhost:3000/reset/${user.resetToken}`;
+      let message = req.flash('signup-error');
+      console.log('getSignup:', message);
+      if (message.length > 0) {
+        message = message[0];
+      } else {
+        message = null;
+      }
+      res.render('auth/new-password', {
+        path: '/new-password',
+        pageTitle: 'New Password',
+        errorMessage: message,
+        userId: user._id.toString(),
+        token: token,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+exports.postNewPassword = (req, res) => {
+  const newPassword = req.body.password;
+  const userId = req.body.userId;
+  const token = req.body.token;
+  let resetUser;
+  User.findOne({
+    _id: userId,
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((user) => {
+      console.log('user:', user);
+      resetUser = user;
+      return bcrypt.hash(newPassword, 12);
+    })
+    .then((hashedPassword) => {
+      console.log('hashedpassoed:', hashedPassword);
+      resetUser.password = hashedPassword;
+      resetUser.resetToken = undefined;
+      resetUser.resetTokenExpiration = undefined;
+      return resetUser.save();
+    })
+    .then(() => {
+      const rlink = `http://localhost:${process.env.PORT}/login`;
       let mailOptions = {
         from: process.env.FROM_EMAIL,
-        to: email,
-        subject: 'Password reset',
-        // text: 'Welcome to BookStore',
+        to: resetUser.email,
+        subject: 'Successfully Password reset',
         html: `
-          <p>You requested a password reset</p>
-          <p>click this <a href=${rlink}>Link</a> to set a new password</p>
-          `,
+        <p>You requested to password reset was successful</p>
+        <p>click this <a href=${rlink}>Link</a> to login</p>
+        `,
       };
-      res.redirect('/');
+      res.redirect('/login');
       return sendEmail(mailOptions, (err) => {
         if (err) {
           console.log('Error:' + err);
@@ -179,7 +249,5 @@ exports.postReset = (req, res) => {
         }
       });
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((err) => console.log(err));
 };
