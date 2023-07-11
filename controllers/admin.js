@@ -9,6 +9,7 @@ exports.getAddProduct = (req, res) => {
     isAuthenticated: req.session.isLoggedIn,
     hasError: false,
     errorMessage: null,
+    validationErrors: [],
   });
 };
 
@@ -33,6 +34,7 @@ exports.postAddProduct = (req, res) => {
       },
       hasError: true,
       errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
     });
   }
   const product = new Product({
@@ -72,6 +74,7 @@ exports.getEditProduct = (req, res) => {
         isAuthenticated: req.session.isLoggedIn,
         hasError: false,
         errorMessage: null,
+        validationErrors: [],
       });
     })
     .catch((err) => console.log(err));
@@ -91,15 +94,16 @@ exports.postEditProduct = (req, res) => {
       path: '/admin/edit-product',
       editing: true,
       product: {
+        _id: prodId,
         title: updatedTitle,
         price: updatedPrice,
         description: updatedDesc,
         imageUrl: updatedImageUrl,
-        userId: req.user,
       },
       isAuthenticated: req.session.isLoggedIn,
       hasError: true,
       errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
     });
   }
   Product.findById(prodId)
