@@ -46,7 +46,7 @@ exports.getSignup = (req, res) => {
   });
 };
 
-exports.postLogin = (req, res) => {
+exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const errors = validationResult(req);
@@ -89,10 +89,14 @@ exports.postLogin = (req, res) => {
           res.redirect('/login');
         });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.postSignup = (req, res) => {
+exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
@@ -150,7 +154,9 @@ exports.postSignup = (req, res) => {
         });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -176,7 +182,7 @@ exports.getReset = (req, res) => {
   });
 };
 
-exports.postReset = (req, res) => {
+exports.postReset = (req, res, next) => {
   const email = req.body.email;
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
@@ -219,12 +225,14 @@ exports.postReset = (req, res) => {
         });
       })
       .catch((err) => {
-        console.log(err);
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
       });
   });
 };
 
-exports.getNewPassword = (req, res) => {
+exports.getNewPassword = (req, res, next) => {
   const token = req.params.token;
   User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
     .then((user) => {
@@ -244,11 +252,13 @@ exports.getNewPassword = (req, res) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
-exports.postNewPassword = (req, res) => {
+exports.postNewPassword = (req, res, next) => {
   const newPassword = req.body.password;
   const userId = req.body.userId;
   const token = req.body.token;
@@ -290,5 +300,9 @@ exports.postNewPassword = (req, res) => {
         }
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };

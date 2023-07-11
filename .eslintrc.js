@@ -20,5 +20,12 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
   },
-  rules: {},
+  rules: {
+    // 'no-unused-vars': [
+    //   'error',
+    //   {
+    //     argsIgnorePattern: 'error|req|res|next',
+    //   },
+    // ],
+  },
 };
