@@ -17,6 +17,11 @@ exports.getLogin = (req, res) => {
     path: '/login',
     pageTitle: 'Login',
     errorMessage: message,
+    oldInput: {
+      email: '',
+      password: '',
+    },
+    validationErrors: [],
   });
 };
 
@@ -37,6 +42,7 @@ exports.getSignup = (req, res) => {
       password: '',
       confirmPassword: '',
     },
+    validationErrors: [],
   });
 };
 
@@ -50,12 +56,17 @@ exports.postLogin = (req, res) => {
       path: '/login',
       pageTitle: 'Login',
       errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email: email,
+        password: password,
+      },
+      validationErrors: errors.array(),
     });
   }
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        req.flash('login-error', 'Invalid email or password.');
+        req.flash('login-error', 'email not found');
         // console.log(req.flash('error'));
         return res.redirect('/login');
       }
@@ -70,7 +81,7 @@ exports.postLogin = (req, res) => {
               res.redirect('/');
             });
           }
-          req.flash('login-error', 'Invalid email or password.');
+          req.flash('login-error', 'password not match');
           res.redirect('/login');
         })
         .catch((err) => {
@@ -97,6 +108,7 @@ exports.postSignup = (req, res) => {
         password: password,
         confirmPassword: confirmPassword,
       },
+      validationErrors: errors.array(),
     });
   }
   User.findOne({ email: email })
@@ -126,7 +138,7 @@ exports.postSignup = (req, res) => {
             to: email,
             subject: 'Signup Success',
             text: 'Welcome to BookStore',
-            html: '<h2>Your have Successfully Signed in to BookStore!<h2>',
+            html: '<h2>Your have Successfully SignedUp in to BookStore!<h2>',
           };
           return sendEmail(mailOptions, (err) => {
             if (err) {

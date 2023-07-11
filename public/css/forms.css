@@ -1,6 +1,9 @@
 .form-control {
   margin: 1rem 0;
 }
+.form-control input.invalid {
+  border-color: red;
+}
 
 .form-control label,
 .form-control input,
@@ -26,9 +29,8 @@
   padding: 0.25rem 1rem;
   text-decoration: none;
   font: inherit;
-  border: 1px solid #5a5c5c;
   color: #4475e0;
-  background: white;
+  background: rgb(236, 230, 230);
   border-radius: 3px;
   cursor: pointer;
 }

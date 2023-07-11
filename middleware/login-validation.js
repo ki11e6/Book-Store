@@ -12,9 +12,12 @@ module.exports = [
         throw new Error('This is not a valid email address');
       }
       return true;
-    }),
-  body('password', 'Please enter a password length min 5 and max 16').isLength({
-    min: 5,
-    max: 16,
-  }),
+    })
+    .normalizeEmail(),
+  body('password', 'Please enter a password length min 5 and max 16')
+    .isLength({
+      min: 5,
+      max: 16,
+    })
+    .trim(),
 ];
