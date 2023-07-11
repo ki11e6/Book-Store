@@ -27,6 +27,12 @@
                                     class="<%= validationErrors.find(e=>e.path==='imageUrl')?'invalid':'' %>"
                                     value="<% if (editing || hasError) { %><%= product.imageUrl %><% } %>">
                             </div>
+                            <!-- <div class="form-control">
+                                <label for="imageUrl">Image URL</label>
+                                <input type="text" name="imageUrl" id="imageUrl"
+                                    class="<%= validationErrors.find(e=>e.path==='imageUrl')?'invalid':'' %>"
+                                    value="<% if (editing || hasError) { %><%= product.imageUrl %><% } %>">
+                            </div> -->
                             <div class="form-control">
                                 <label for="price">Price: ₹</label>
                                 <input type="number" name="price" id="price" step="0.01"
