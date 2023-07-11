@@ -2,15 +2,16 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('../util/nodemailGmail');
 const crypto = require('crypto');
+const { validationResult } = require('express-validator');
 
 exports.getLogin = (req, res) => {
   let message = req.flash('login-error');
   if (message.length > 0) {
     message = message[0];
-    console.log('getlogin:', message);
+    // console.log('getlogin:', message);
   } else {
     message = null;
-    console.log('getlogin:', message);
+    // console.log('getlogin:', message);
   }
   res.render('auth/login', {
     path: '/login',
@@ -21,7 +22,7 @@ exports.getLogin = (req, res) => {
 
 exports.getSignup = (req, res) => {
   let message = req.flash('signup-error');
-  console.log('getSignup:', message);
+  // console.log('getSignup:', message);
   if (message.length > 0) {
     message = message[0];
   } else {
@@ -41,7 +42,7 @@ exports.postLogin = (req, res) => {
     .then((user) => {
       if (!user) {
         req.flash('login-error', 'Invalid email or password.');
-        console.log(req.flash('error'));
+        // console.log(req.flash('error'));
         return res.redirect('/login');
       }
       bcrypt
@@ -70,6 +71,15 @@ exports.postSignup = (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   // const confirmPassword = req.body.confirmPassword;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMessage: errors.array()[0].msg,
+    });
+  }
   User.findOne({ email: email })
     .then((userDoc) => {
       if (userDoc) {
@@ -124,7 +134,7 @@ exports.getReset = (req, res) => {
   let message = req.flash('reset-error');
   if (message.length > 0) {
     message = message[0];
-    console.log(message);
+    // console.log(message);
   } else {
     message = null;
   }
@@ -147,7 +157,7 @@ exports.postReset = (req, res) => {
       .then((user) => {
         if (!user) {
           req.flash('reset-error', 'Email does not exist');
-          console.log(req.flash('error'));
+          // console.log(req.flash('error'));
           return res.redirect('/reset');
         }
 
@@ -188,7 +198,7 @@ exports.getNewPassword = (req, res) => {
   User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
     .then((user) => {
       let message = req.flash('signup-error');
-      console.log('getSignup:', message);
+      // console.log('getSignup:', message);
       if (message.length > 0) {
         message = message[0];
       } else {
@@ -218,12 +228,12 @@ exports.postNewPassword = (req, res) => {
     resetTokenExpiration: { $gt: Date.now() },
   })
     .then((user) => {
-      console.log('user:', user);
+      // console.log('user:', user);
       resetUser = user;
       return bcrypt.hash(newPassword, 12);
     })
     .then((hashedPassword) => {
-      console.log('hashedpassoed:', hashedPassword);
+      // console.log('hashedpassoed:', hashedPassword);
       resetUser.password = hashedPassword;
       resetUser.resetToken = undefined;
       resetUser.resetTokenExpiration = undefined;
