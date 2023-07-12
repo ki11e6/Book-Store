@@ -9,6 +9,7 @@ const path = require('path');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 const multer = require('multer');
+const { fileStorage, fileFilter } = require('./middleware/multer-config');
 require('dotenv').config();
 
 const MONGODB_URL = process.env.MONGODB_URI;
@@ -26,7 +27,11 @@ const authRoutes = require('./routes/auth');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ dest: 'images' }).single('image')); //image is the form type name
+//image is the form type name
+// app.use(multer({ dest: 'images' }).single('image'));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
+);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   session({
@@ -76,14 +81,14 @@ app.use('/500', errorController.get500);
 app.use(errorController.get404);
 //express error handler, next is to recognize it as an error handling middleware
 // eslint-disable-next-line no-unused-vars
-app.use((error, req, res, next) => {
-  // res.redirect('/500');
-  console.log(error.message);
-  res.status(500).render('500', {
-    pageTitle: 'Internal Server Error',
-    path: '/500',
-  });
-});
+// app.use((error, req, res, next) => {
+//   // res.redirect('/500');
+//   console.log(error.message);
+//   res.status(500).render('500', {
+//     pageTitle: 'Internal Server Error',
+//     path: '/500',
+//   });
+// });
 
 mongoose
   .connect(MONGODB_URL)
