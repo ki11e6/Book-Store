@@ -9,7 +9,7 @@ const path = require('path');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 const multer = require('multer');
-const { fileStorage, fileFilter } = require('./middleware/multer-config');
+const { fileStorage, fileFilter } = require('./util/multer-config');
 require('dotenv').config();
 
 const MONGODB_URL = process.env.MONGODB_URI;
