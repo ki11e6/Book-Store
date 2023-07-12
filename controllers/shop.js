@@ -155,7 +155,7 @@ exports.getInvoice = (req, res, next) => {
         return next(new Error('Unauthorized'));
       }
       const invoiceName = 'invoice-' + orderId + '.pdf';
-      const invoicePath = path.join('data', 'invoice', invoiceName);
+      const invoicePath = path.join('data', 'invoices', invoiceName);
       fs.readFile(invoicePath, (err, data) => {
         if (err) {
           return next(err);
@@ -167,6 +167,13 @@ exports.getInvoice = (req, res, next) => {
         );
         res.send(data);
       });
+      // const file = fs.createReadStream(invoicePath);
+      // res.setHeader('Content-type', 'application/pdf');
+      // res.setHeader(
+      //   'Content-Disposition',
+      //   'inline; filename="' + invoiceName + '"'
+      // );
+      // file.pipe(res);
     })
     .catch((err) => next(err));
 };
