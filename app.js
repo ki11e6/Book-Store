@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 const path = require('path');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
+const multer = require('multer');
 require('dotenv').config();
 
 const MONGODB_URL = process.env.MONGODB_URI;
@@ -25,6 +26,7 @@ const authRoutes = require('./routes/auth');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({ dest: 'images' }).single('image')); //image is the form type name
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   session({
