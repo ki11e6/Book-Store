@@ -22,10 +22,8 @@
                                     value="<% if (editing || hasError) { %><%= product.title %><% } %>">
                             </div>
                             <div class="form-control">
-                                <label for="imageUrl">Image URL</label>
-                                <input type="text" name="imageUrl" id="imageUrl"
-                                    class="<%= validationErrors.find(e=>e.path==='imageUrl')?'invalid':'' %>"
-                                    value="<% if (editing || hasError) { %><%= product.imageUrl %><% } %>">
+                                <label for="image">Image</label>
+                                <input type="file" name="image" id="image">
                             </div>
                             <!-- <div class="form-control">
                                 <label for="imageUrl">Image URL</label>

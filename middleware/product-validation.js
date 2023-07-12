@@ -5,7 +5,7 @@ module.exports = [
     .isString()
     .isLength({ min: 3 })
     .trim(),
-  body('imageUrl', 'Enter valid image Url').isURL(),
+  // body('imageUrl', 'Enter valid image Url').isURL(),
   body('price', 'Enter valid numbers').isFloat(),
   body('description', 'Description should be atleast length 10')
     .isString()

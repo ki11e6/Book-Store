@@ -14,12 +14,13 @@ exports.getAddProduct = (req, res) => {
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const imageUrl = req.body.image;
   const price = req.body.price;
   const description = req.body.description;
   const errors = validationResult(req);
+  // console.log(imageUrl);
   if (!errors.isEmpty()) {
-    console.log(errors.array());
+    console.log('postAddProduct ValidationError:', errors.array());
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
       path: '/admin/add-product',
@@ -45,7 +46,7 @@ exports.postAddProduct = (req, res, next) => {
   product
     .save()
     .then(() => {
-      console.log('Created Product');
+      console.log('Product Created ');
       res.redirect('/admin/products');
     })
     .catch((err) => {
@@ -77,7 +78,6 @@ exports.getEditProduct = (req, res, next) => {
         errorMessage: null,
         validationErrors: [],
       });
-      throw new Error('dummy');
     })
     .catch((err) => {
       const error = new Error(err);
@@ -90,11 +90,11 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
+  const updatedImageUrl = req.body.image;
   const updatedDesc = req.body.description;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors.array());
+    console.log('postEditProduct ValidationError:', errors.array());
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Edit Product',
       path: '/admin/edit-product',
@@ -121,7 +121,7 @@ exports.postEditProduct = (req, res, next) => {
       product.description = updatedDesc;
       product.imageUrl = updatedImageUrl;
       return product.save().then(() => {
-        console.log('UPDATED PRODUCT!');
+        console.log('PRODUCT UPDATED!');
         res.redirect('/admin/products');
       });
     })
@@ -133,12 +133,11 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  console.log(req.user._id);
+  // console.log(req.user._id);
   Product.find({ userId: req.user._id })
     // .select('title price -_id')
     // .populate('userId', 'name')
     .then((products) => {
-      console.log(products);
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
@@ -154,7 +153,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteOne({ id: prodId, userId: req.user._id })
+  Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then(() => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
