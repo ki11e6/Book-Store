@@ -82,14 +82,14 @@ app.use('/500', errorController.get500);
 app.use(errorController.get404);
 //express error handler, next is to recognize it as an error handling middleware
 // eslint-disable-next-line no-unused-vars
-// app.use((error, req, res, next) => {
-//   // res.redirect('/500');
-//   console.log(error.message);
-//   res.status(500).render('500', {
-//     pageTitle: 'Internal Server Error',
-//     path: '/500',
-//   });
-// });
+app.use((error, req, res, next) => {
+  // res.redirect('/500');
+  console.log(error.message);
+  res.status(500).render('500', {
+    pageTitle: 'Internal Server Error',
+    path: '/500',
+  });
+});
 
 mongoose
   .connect(MONGODB_URL)
