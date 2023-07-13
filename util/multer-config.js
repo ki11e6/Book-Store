@@ -5,7 +5,14 @@ exports.fileStorage = multer.diskStorage({
     cb(null, './images');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(
+      null,
+      Date.now() +
+        '-' +
+        Math.floor(Math.random() * 100 + 1) +
+        '-' +
+        file.originalname
+    );
   },
 });
 
