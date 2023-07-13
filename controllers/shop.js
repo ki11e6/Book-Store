@@ -42,7 +42,7 @@ exports.getProduct = (req, res, next) => {
 
 exports.getIndex = (req, res, next) => {
   const page = req.query.page ?? 1;
-  console.log(page);
+  Product.find().count();
   Product.find()
     .skip((page - 1) * itemPerPage)
     .limit(itemPerPage)
