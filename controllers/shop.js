@@ -3,6 +3,8 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const invoiceGenerator = require('../util/pdfkit-config');
 
+const itemPerPage = 3;
+
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then((products) => {
@@ -39,7 +41,11 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
+  const page = req.query.page ?? 1;
+  console.log(page);
   Product.find()
+    .skip((page - 1) * itemPerPage)
+    .limit(itemPerPage)
     .then((products) => {
       res.render('shop/index', {
         prods: products,
